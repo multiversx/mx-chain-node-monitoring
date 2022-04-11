@@ -1,0 +1,19 @@
+[General]
+    TriggerIntervalSec = 5
+
+[Alarms]
+    [Alarms.NodeRating]
+        Threshold = 5.0 # percentage change limit
+        Identity = "" # identity string
+
+[Notifiers]
+    [Notifiers.Email]
+        Enabled = true
+        EmailHost = "" # like smtp.gmail.com
+        EmailPort = 587
+        EmailUsername = ""  # email address, like aaa.bbb@gmail.com
+        EmailPassword = ""  
+        From = "" # email address
+        To = [
+            "",
+        ]
