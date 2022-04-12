@@ -41,18 +41,18 @@ func (en *emailNotifier) push(msg data.NotificationMessage) error {
 		auth,
 		en.config.From,
 		en.config.To,
-		en.setMessage(msg),
+		en.msgToEmailMessageBytes(msg),
 	)
 	if err != nil {
 		return err
 	}
 
-	log.Info("Email sent")
+	log.Info("Email sent to: %w, Message: %s", en.config.To, msg.Message)
 
 	return nil
 }
 
-func (en *emailNotifier) setMessage(msg data.NotificationMessage) []byte {
+func (en *emailNotifier) msgToEmailMessageBytes(msg data.NotificationMessage) []byte {
 	msgStr := fmt.Sprintf("To: %s\r\nSubject: %s!\r\n\r\n%s\r\n", "Email", "Node rating", msg.Message)
 	return []byte(msgStr)
 }

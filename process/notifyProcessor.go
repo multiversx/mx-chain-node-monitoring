@@ -6,28 +6,26 @@ import (
 	"github.com/ElrondNetwork/node-monitoring/data"
 )
 
-type ArgsNotifyProcessor struct {
-}
-
 type notifyProcessor struct {
 	workers    map[string]Notifier
 	mutWorkers sync.RWMutex
 }
 
-func NewNotifyProcessor(args ArgsNotifyProcessor) (*notifyProcessor, error) {
-	bp := &notifyProcessor{
+// NewNotifyProcessor will create a new notify processor instance
+func NewNotifyProcessor() *notifyProcessor {
+	return &notifyProcessor{
 		workers: make(map[string]Notifier),
 	}
-
-	return bp, nil
 }
 
+// AddNotifier will add a notifier instance to workers list
 func (bp *notifyProcessor) AddNotifier(notifier Notifier) {
 	bp.mutWorkers.RLock()
 	bp.workers[notifier.GetID()] = notifier
 	bp.mutWorkers.RUnlock()
 }
 
+// PushMessage will push notification message to all registered workers
 func (bp *notifyProcessor) PushMessage(msg data.NotificationMessage) {
 	bp.mutWorkers.RLock()
 	for _, worker := range bp.workers {

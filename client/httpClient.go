@@ -21,8 +21,9 @@ import (
 var log = logger.GetOrCreate("client/httpClient")
 
 const (
-	firstRunValue float64 = -1
-	maxRating             = 10000000
+	firstRunValue    float64 = -1
+	maxRating                = 10000000
+	minReqTimeoutSec         = 1
 )
 
 const (
@@ -46,6 +47,10 @@ type HTTPClientWrapperArgs struct {
 
 // NewHTTPClientWrapper creates an instance of httpClient which is a wrapper for http.Client
 func NewHTTPClientWrapper(args HTTPClientWrapperArgs) (*httpClientWrapper, error) {
+	if args.ReqTimeoutSec < minReqTimeoutSec {
+		return nil, fmt.Errorf("%w, provided: %d, minimum: %d", common.ErrInvalidValue, args.ReqTimeoutSec, minReqTimeoutSec)
+	}
+
 	httpClient := http.DefaultClient
 	httpClient.Timeout = time.Duration(args.ReqTimeoutSec) * time.Second
 

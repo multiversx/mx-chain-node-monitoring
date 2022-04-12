@@ -1,9 +1,11 @@
 package client
 
+// APIResponse defines an api reponse holding a list of nodes
 type APIResponse struct {
 	Nodes []APINode
 }
 
+// APINode defines an api node structure
 type APINode struct {
 	Bls                        string  `json:"bls"`
 	Name                       string  `json:"name"`

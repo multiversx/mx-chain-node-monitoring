@@ -1,6 +1,9 @@
 package monitoring
 
 import (
+	"os"
+	"os/signal"
+
 	"github.com/ElrondNetwork/node-monitoring/client"
 	"github.com/ElrondNetwork/node-monitoring/config"
 	"github.com/ElrondNetwork/node-monitoring/notifiers/email"
@@ -35,10 +38,7 @@ func (mr *monitoringRunner) Start() error {
 		return err
 	}
 
-	processor, err := process.NewNotifyProcessor(process.ArgsNotifyProcessor{})
-	if err != nil {
-		return err
-	}
+	notifyProcessor := process.NewNotifyProcessor()
 
 	if mr.config.Notifiers.Email.Enabled {
 		argsEmailNotifier := email.ArgsEmailNotifier{Config: mr.config.Notifiers.Email}
@@ -46,12 +46,12 @@ func (mr *monitoringRunner) Start() error {
 		if err != nil {
 			return err
 		}
-		processor.AddNotifier(emailNotifier)
+		notifyProcessor.AddNotifier(emailNotifier)
 	}
 
 	argsEventsProcessor := process.ArgsEventsProcessor{
 		Client:             connector,
-		Pusher:             processor,
+		Pusher:             notifyProcessor,
 		TriggerInternalSec: mr.config.General.TriggerIntervalSec,
 	}
 	eventsProcessor, err := process.NewEventsProcessor(argsEventsProcessor)
@@ -60,6 +60,26 @@ func (mr *monitoringRunner) Start() error {
 	}
 
 	eventsProcessor.Run()
+
+	err = waitForGracefulShutdown(eventsProcessor)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func waitForGracefulShutdown(
+	processor eventsHandler,
+) error {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, os.Kill)
+	<-quit
+
+	err := processor.Close()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
