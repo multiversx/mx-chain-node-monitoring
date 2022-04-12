@@ -5,6 +5,9 @@
     [Alarms.NodeRating]
         Threshold = 5.0 # percentage change limit
         Identity = "" # identity string
+        PubKeys = [
+            "",
+        ]
 
 [Notifiers]
     [Notifiers.Email]

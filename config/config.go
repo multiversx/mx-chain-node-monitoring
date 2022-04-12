@@ -27,6 +27,7 @@ type Alarms struct {
 type NodeRating struct {
 	Threshold float64
 	Identity  string
+	PubKeys   []string
 }
 
 // Email holds the configuration for email notifier

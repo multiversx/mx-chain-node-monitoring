@@ -30,6 +30,7 @@ const (
 	baseURL = "https://api.elrond.com"
 
 	nodesIdentifierPath = "/nodes?identity=%s"
+	nodesBLSKeyPath     = "/nodes/%s"
 )
 
 type httpClientWrapper struct {
@@ -64,26 +65,28 @@ func NewHTTPClientWrapper(args HTTPClientWrapperArgs) (*httpClientWrapper, error
 func (hcw *httpClientWrapper) GetEvent() (data.NotificationMessage, error) {
 	event := data.NotificationMessage{}
 
-	identity := hcw.config.Identity
-	percentageThreshold := hcw.config.Threshold
-
 	if hcw.lastValue == firstRunValue {
 		return event, nil
 	}
 
-	path := fmt.Sprintf(nodesIdentifierPath, identity)
-	nodes, err := hcw.callGetRestEndPoint(baseURL, path)
+	nodes, err := hcw.getNodes()
 	if err != nil {
 		return event, err
 	}
 
 	msg := ""
 	for _, node := range nodes {
+		// TODO: evaluate simply if the rating drops under a specified threshold
 		diff := math.Abs(node.TempRating - hcw.lastValue)
 		changePercentage := diff / float64(maxRating)
-		if changePercentage > percentageThreshold {
+		if changePercentage > hcw.config.Threshold {
 			event.Level = common.CriticalEvent
-			nodeMsg := fmt.Sprintf("TempRating lower than threshold, current value: %f, threshold value: %f\n", node.TempRating, percentageThreshold)
+			nodeMsg := fmt.Sprintf(
+				"%s: TempRating lower than threshold, current value: %f, threshold value: %f\n",
+				node.Name,
+				node.TempRating,
+				hcw.config.Threshold,
+			)
 			msg = msg + nodeMsg
 		}
 	}
@@ -93,11 +96,59 @@ func (hcw *httpClientWrapper) GetEvent() (data.NotificationMessage, error) {
 	return event, nil
 }
 
+func (hcw *httpClientWrapper) getNodes() ([]APINode, error) {
+	identity := hcw.config.Identity
+
+	if identity != "" {
+		return hcw.fetchNodesByIdentity()
+	}
+
+	return hcw.fetchAPINodesByBLSKey()
+}
+
+func (hcw *httpClientWrapper) fetchNodesByIdentity() ([]APINode, error) {
+	path := fmt.Sprintf(nodesIdentifierPath, hcw.config.Identity)
+	responseBodyBytes, err := hcw.callGetRestEndPoint(baseURL, path)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []APINode
+	err = json.Unmarshal(responseBodyBytes, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (hcw *httpClientWrapper) fetchAPINodesByBLSKey() ([]APINode, error) {
+	nodes := make([]APINode, 0)
+
+	for _, pubKey := range hcw.config.PubKeys {
+		path := fmt.Sprintf(nodesBLSKeyPath, pubKey)
+		responseBodyBytes, err := hcw.callGetRestEndPoint(baseURL, path)
+		if err != nil {
+			return nil, err
+		}
+
+		var response APINode
+		err = json.Unmarshal(responseBodyBytes, &response)
+		if err != nil {
+			return nil, err
+		}
+
+		nodes = append(nodes, response)
+	}
+
+	return nodes, nil
+}
+
 // callGetRestEndPoint calls an external end point
 func (hcw *httpClientWrapper) callGetRestEndPoint(
 	address string,
 	path string,
-) ([]APINode, error) {
+) ([]byte, error) {
 	fmt.Println(address)
 	fmt.Println(path)
 	req, err := http.NewRequest("GET", address+path, nil)
@@ -125,18 +176,7 @@ func (hcw *httpClientWrapper) callGetRestEndPoint(
 		}
 	}()
 
-	responseBodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var response []APINode
-	err = json.Unmarshal(responseBodyBytes, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
+	return ioutil.ReadAll(resp.Body)
 }
 
 func isTimeoutError(err error) bool {
