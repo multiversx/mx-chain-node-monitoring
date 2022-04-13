@@ -3,8 +3,7 @@
 
 [Alarms]
     [Alarms.NodeRating]
-        Threshold = 5.0 # percentage change limit
-        Identity = "" # identity string
+        Threshold = 1.0 # percentage change limit
         PubKeys = [
             "",
         ]

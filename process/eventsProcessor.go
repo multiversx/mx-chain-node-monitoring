@@ -71,6 +71,8 @@ func (ep *eventsProcessor) handleEvents() {
 		ep.pusher.PushMessage(event)
 	case common.InfoEvent:
 		log.Info("Info event received. Will not send notification.")
+	case common.NoEvent:
+		log.Debug("No event received. Will not send notification.")
 	default:
 		log.Error("Invalid event level")
 	}

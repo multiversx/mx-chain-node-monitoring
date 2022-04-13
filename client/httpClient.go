@@ -36,7 +36,8 @@ const (
 type httpClientWrapper struct {
 	httpClient    *http.Client
 	mutHTTPClient sync.RWMutex
-	lastValue     float64
+	lastValues    map[string]float64
+	firstRun      bool
 	config        *config.NodeRating
 }
 
@@ -57,19 +58,23 @@ func NewHTTPClientWrapper(args HTTPClientWrapperArgs) (*httpClientWrapper, error
 
 	return &httpClientWrapper{
 		httpClient: httpClient,
-		lastValue:  firstRunValue,
+		lastValues: make(map[string]float64),
+		firstRun:   true,
 		config:     args.Config,
 	}, nil
 }
 
 func (hcw *httpClientWrapper) GetEvent() (data.NotificationMessage, error) {
-	event := data.NotificationMessage{}
+	if hcw.firstRun == true {
+		log.Info("First run. Will not trigger any event.")
+		hcw.firstRun = false
 
-	if hcw.lastValue == firstRunValue {
-		return event, nil
+		return hcw.handleFirstRun()
 	}
 
-	nodes, err := hcw.getNodes()
+	event := data.NotificationMessage{Level: common.InfoEvent}
+
+	nodes, err := hcw.fetchAPINodesByBLSKey()
 	if err != nil {
 		return event, err
 	}
@@ -77,18 +82,25 @@ func (hcw *httpClientWrapper) GetEvent() (data.NotificationMessage, error) {
 	msg := ""
 	for _, node := range nodes {
 		// TODO: evaluate simply if the rating drops under a specified threshold
-		diff := math.Abs(node.TempRating - hcw.lastValue)
-		changePercentage := diff / float64(maxRating)
+		diff := node.TempRating - hcw.lastValues[node.Bls]
+		if diff >= 0 {
+			continue
+		}
+
+		changePercentage := math.Abs(diff) / float64(maxRating)
 		if changePercentage > hcw.config.Threshold {
 			event.Level = common.CriticalEvent
 			nodeMsg := fmt.Sprintf(
-				"%s: TempRating lower than threshold, current value: %f, threshold value: %f\n",
+				"%s: TempRating decreased with %.1f percent, current value: %.2f, last value: %.2f\n",
 				node.Name,
-				node.TempRating,
 				hcw.config.Threshold,
+				node.TempRating,
+				hcw.lastValues[node.Bls],
 			)
 			msg = msg + nodeMsg
 		}
+
+		hcw.lastValues[node.Bls] = node.TempRating
 	}
 
 	event.Message = msg
@@ -96,30 +108,17 @@ func (hcw *httpClientWrapper) GetEvent() (data.NotificationMessage, error) {
 	return event, nil
 }
 
-func (hcw *httpClientWrapper) getNodes() ([]APINode, error) {
-	identity := hcw.config.Identity
-
-	if identity != "" {
-		return hcw.fetchNodesByIdentity()
-	}
-
-	return hcw.fetchAPINodesByBLSKey()
-}
-
-func (hcw *httpClientWrapper) fetchNodesByIdentity() ([]APINode, error) {
-	path := fmt.Sprintf(nodesIdentifierPath, hcw.config.Identity)
-	responseBodyBytes, err := hcw.callGetRestEndPoint(baseURL, path)
+func (hcw *httpClientWrapper) handleFirstRun() (data.NotificationMessage, error) {
+	nodes, err := hcw.fetchAPINodesByBLSKey()
 	if err != nil {
-		return nil, err
+		return data.NotificationMessage{}, err
 	}
 
-	var response []APINode
-	err = json.Unmarshal(responseBodyBytes, &response)
-	if err != nil {
-		return nil, err
+	for _, node := range nodes {
+		hcw.lastValues[node.Bls] = node.TempRating
 	}
 
-	return response, nil
+	return data.NotificationMessage{Level: common.NoEvent}, nil
 }
 
 func (hcw *httpClientWrapper) fetchAPINodesByBLSKey() ([]APINode, error) {
@@ -149,14 +148,12 @@ func (hcw *httpClientWrapper) callGetRestEndPoint(
 	address string,
 	path string,
 ) ([]byte, error) {
-	fmt.Println(address)
-	fmt.Println(path)
 	req, err := http.NewRequest("GET", address+path, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	userAgent := "Elrond Proxy / 1.0.0 <Requesting data from api>"
+	userAgent := "Elrond Node Monitoring / 1.0.0 <Requesting data from api>"
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", userAgent)
 

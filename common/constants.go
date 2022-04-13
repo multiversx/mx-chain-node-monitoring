@@ -4,8 +4,10 @@ package common
 type EventLevel int
 
 const (
+	// NoEvent specifies when no event is triggered
+	NoEvent EventLevel = iota
 	// InfoEvent defines a general info event type
-	InfoEvent EventLevel = iota
+	InfoEvent
 	// CriticalEvent defines a critical event type
 	CriticalEvent
 )

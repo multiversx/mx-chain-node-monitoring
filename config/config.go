@@ -26,7 +26,6 @@ type Alarms struct {
 // NodeRating holds the configuration for node rating alarm
 type NodeRating struct {
 	Threshold float64
-	Identity  string
 	PubKeys   []string
 }
 
