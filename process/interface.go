@@ -11,9 +11,11 @@ type Notifier interface {
 // Connector defines the behaviour of a client connector which will fetch the event
 type Connector interface {
 	GetEvent() (data.NotificationMessage, error)
+	IsInterfaceNil() bool
 }
 
 // Pusher defines the behaviour of a push notification instance
 type Pusher interface {
 	PushMessage(msg data.NotificationMessage)
+	IsInterfaceNil() bool
 }

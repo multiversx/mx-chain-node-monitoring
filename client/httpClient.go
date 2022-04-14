@@ -183,3 +183,8 @@ func isTimeoutError(err error) bool {
 
 	return false
 }
+
+// IsInterfaceNil returns true if there is no value under the interface
+func (hcw *httpClientWrapper) IsInterfaceNil() bool {
+	return hcw == nil
+}

@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ElrondNetwork/elrond-go-core/core/check"
 	logger "github.com/ElrondNetwork/elrond-go-logger"
 	"github.com/ElrondNetwork/node-monitoring/common"
 )
 
 var log = logger.GetOrCreate("process")
+
+const minTriggerIntervalSec = 1
 
 // ArgsEventsProcessor defines the arguments needed for events processor creation
 type ArgsEventsProcessor struct {
@@ -21,18 +24,33 @@ type ArgsEventsProcessor struct {
 type eventsProcessor struct {
 	client             Connector
 	pusher             Pusher
-	triggerInternalSec time.Duration
+	triggerInternalSec int
 	cancelFunc         func()
 }
 
 // NewEventsProcessor will create a new events processor instance
 func NewEventsProcessor(args ArgsEventsProcessor) (*eventsProcessor, error) {
 	ep := &eventsProcessor{
-		client: args.Client,
-		pusher: args.Pusher,
+		client:             args.Client,
+		pusher:             args.Pusher,
+		triggerInternalSec: args.TriggerInternalSec,
 	}
 
 	return ep, nil
+}
+
+func checkArgs(args ArgsEventsProcessor) error {
+	if check.IfNil(args.Client) {
+		return ErrNilClient
+	}
+	if check.IfNil(args.Pusher) {
+		return ErrNilPusher
+	}
+	if args.TriggerInternalSec <= minTriggerIntervalSec {
+		return fmt.Errorf("%w: minimum trigger interval in seconds %d, provided %d", common.ErrInvalidValue, args.TriggerInternalSec, minTriggerIntervalSec)
+	}
+
+	return nil
 }
 
 // Run will trigger the main process loop
@@ -44,7 +62,7 @@ func (ep *eventsProcessor) Run() {
 }
 
 func (ep *eventsProcessor) run(ctx context.Context) {
-	timer := time.NewTicker(time.Second * 5)
+	timer := time.NewTicker(time.Second * time.Duration(ep.triggerInternalSec))
 	defer timer.Stop()
 
 	for {
