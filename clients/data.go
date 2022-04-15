@@ -1,4 +1,4 @@
-package client
+package clients
 
 // APIResponse defines an api reponse holding a list of nodes
 type APIResponse struct {
