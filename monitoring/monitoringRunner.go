@@ -4,11 +4,15 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/ElrondNetwork/node-monitoring/client"
+	logger "github.com/ElrondNetwork/elrond-go-logger"
+	"github.com/ElrondNetwork/node-monitoring/clients"
+	noderating "github.com/ElrondNetwork/node-monitoring/clients/nodeRating"
 	"github.com/ElrondNetwork/node-monitoring/config"
 	"github.com/ElrondNetwork/node-monitoring/notifiers/email"
 	"github.com/ElrondNetwork/node-monitoring/process"
 )
+
+var log = logger.GetOrCreate("monitoring")
 
 const reqTimeoutSec = 10
 
@@ -29,11 +33,19 @@ func NewMonitoringRunner(cfgs *config.GeneralConfig) (*monitoringRunner, error) 
 
 // Start will trigger the main flow
 func (mr *monitoringRunner) Start() error {
-	clientArgs := client.HTTPClientWrapperArgs{
+	clientArgs := clients.HTTPClientWrapperArgs{
 		ReqTimeoutSec: reqTimeoutSec,
-		Config:        mr.config.Alarms.NodeRating,
 	}
-	connector, err := client.NewHTTPClientWrapper(clientArgs)
+	httpClientWrapper, err := clients.NewHTTPClientWrapper(clientArgs)
+	if err != nil {
+		return err
+	}
+
+	nodeRatingArgs := noderating.ArgsNodeRating{
+		Client: httpClientWrapper,
+		Config: mr.config.Alarms.NodeRating,
+	}
+	nodeRatingClient, err := noderating.NewNodeRatingClient(nodeRatingArgs)
 	if err != nil {
 		return err
 	}
@@ -50,7 +62,7 @@ func (mr *monitoringRunner) Start() error {
 	}
 
 	argsEventsProcessor := process.ArgsEventsProcessor{
-		Client:             connector,
+		Client:             nodeRatingClient,
 		Pusher:             notifyProcessor,
 		TriggerInternalSec: mr.config.General.TriggerIntervalSec,
 	}
@@ -70,11 +82,13 @@ func (mr *monitoringRunner) Start() error {
 }
 
 func waitForGracefulShutdown(
-	processor eventsHandler,
+	processor processorHandler,
 ) error {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, os.Kill)
 	<-quit
+
+	log.Info("closing components...")
 
 	err := processor.Close()
 	if err != nil {

@@ -30,13 +30,16 @@ type eventsProcessor struct {
 
 // NewEventsProcessor will create a new events processor instance
 func NewEventsProcessor(args ArgsEventsProcessor) (*eventsProcessor, error) {
-	ep := &eventsProcessor{
+	err := checkArgs(args)
+	if err != nil {
+		return nil, err
+	}
+
+	return &eventsProcessor{
 		client:             args.Client,
 		pusher:             args.Pusher,
 		triggerInternalSec: args.TriggerInternalSec,
-	}
-
-	return ep, nil
+	}, nil
 }
 
 func checkArgs(args ArgsEventsProcessor) error {
@@ -46,7 +49,7 @@ func checkArgs(args ArgsEventsProcessor) error {
 	if check.IfNil(args.Pusher) {
 		return ErrNilPusher
 	}
-	if args.TriggerInternalSec <= minTriggerIntervalSec {
+	if args.TriggerInternalSec < minTriggerIntervalSec {
 		return fmt.Errorf("%w: minimum trigger interval in seconds %d, provided %d", common.ErrInvalidValue, args.TriggerInternalSec, minTriggerIntervalSec)
 	}
 
@@ -58,7 +61,7 @@ func (ep *eventsProcessor) Run() {
 	var ctx context.Context
 	ctx, ep.cancelFunc = context.WithCancel(context.Background())
 
-	ep.run(ctx)
+	go ep.run(ctx)
 }
 
 func (ep *eventsProcessor) run(ctx context.Context) {
@@ -68,7 +71,7 @@ func (ep *eventsProcessor) run(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Debug("events processor is stopping...")
+			log.Info("events processor is stopping...")
 			return
 		case <-timer.C:
 			ep.handleEvents()
@@ -79,7 +82,7 @@ func (ep *eventsProcessor) run(ctx context.Context) {
 func (ep *eventsProcessor) handleEvents() {
 	event, err := ep.client.GetEvent()
 	if err != nil {
-		fmt.Println("failed to get event")
+		log.Error("failed to get event", "error", err.Error())
 		return
 	}
 

@@ -1,7 +1,7 @@
 package monitoring
 
-// eventsHandler defines the behaviour of an events processor
-type eventsHandler interface {
+// processorHandler defines the behaviour of an events processor
+type processorHandler interface {
 	Run()
 	Close() error
 }
