@@ -3,6 +3,7 @@ package process
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/ElrondNetwork/elrond-go-core/core/check"
@@ -16,13 +17,13 @@ const minTriggerIntervalSec = 1
 
 // ArgsEventsProcessor defines the arguments needed for events processor creation
 type ArgsEventsProcessor struct {
-	Client             Connector
 	Pusher             Pusher
 	TriggerInternalSec int
 }
 
 type eventsProcessor struct {
-	client             Connector
+	clients            map[string]Connector
+	mutClients         sync.RWMutex
 	pusher             Pusher
 	triggerInternalSec int
 	cancelFunc         func()
@@ -36,16 +37,13 @@ func NewEventsProcessor(args ArgsEventsProcessor) (*eventsProcessor, error) {
 	}
 
 	return &eventsProcessor{
-		client:             args.Client,
+		clients:            make(map[string]Connector),
 		pusher:             args.Pusher,
 		triggerInternalSec: args.TriggerInternalSec,
 	}, nil
 }
 
 func checkArgs(args ArgsEventsProcessor) error {
-	if check.IfNil(args.Client) {
-		return ErrNilClient
-	}
 	if check.IfNil(args.Pusher) {
 		return ErrNilPusher
 	}
@@ -54,6 +52,12 @@ func checkArgs(args ArgsEventsProcessor) error {
 	}
 
 	return nil
+}
+
+func (ep *eventsProcessor) AddClients(client Connector) {
+	ep.mutClients.RLock()
+	ep.clients[client.GetID()] = client
+	ep.mutClients.RUnlock()
 }
 
 // Run will trigger the main process loop
@@ -80,22 +84,27 @@ func (ep *eventsProcessor) run(ctx context.Context) {
 }
 
 func (ep *eventsProcessor) handleEvents() {
-	event, err := ep.client.GetEvent()
-	if err != nil {
-		log.Error("failed to get event", "error", err.Error())
-		return
-	}
+	ep.mutClients.RLock()
+	defer ep.mutClients.RUnlock()
 
-	switch event.Level {
-	case common.CriticalEvent:
-		log.Info("Critical Event received. Will try to send event...")
-		ep.pusher.PushMessage(event)
-	case common.InfoEvent:
-		log.Info("Info event received. Will not send notification.")
-	case common.NoEvent:
-		log.Debug("No event received. Will not send notification.")
-	default:
-		log.Error("Invalid event level")
+	for id, client := range ep.clients {
+		event, err := client.GetEvent()
+		if err != nil {
+			log.Error("failed to get event for client", "client", id, "error", err.Error())
+			return
+		}
+
+		switch event.Level {
+		case common.CriticalEvent:
+			log.Info("Critical Event received. Will try to send event.", "clientID", id)
+			ep.pusher.PushMessage(event)
+		case common.InfoEvent:
+			log.Info("Info event received. Will not send notification.", "clientID", id)
+		case common.NoEvent:
+			log.Debug("No event received. Will not send notification.", "clientID", id)
+		default:
+			log.Error("Invalid event level", "clientID", id)
+		}
 	}
 }
 

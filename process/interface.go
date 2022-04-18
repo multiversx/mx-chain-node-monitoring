@@ -11,6 +11,7 @@ type Notifier interface {
 // Connector defines the behaviour of a client connector which will fetch the event
 type Connector interface {
 	GetEvent() (data.NotificationMessage, error)
+	GetID() string
 	IsInterfaceNil() bool
 }
 

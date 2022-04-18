@@ -15,7 +15,6 @@ import (
 
 func createNewEventMockArgs() process.ArgsEventsProcessor {
 	return process.ArgsEventsProcessor{
-		Client:             &mocks.ConnectorStub{},
 		Pusher:             &mocks.PusherStub{},
 		TriggerInternalSec: 1,
 	}
@@ -23,17 +22,6 @@ func createNewEventMockArgs() process.ArgsEventsProcessor {
 
 func TestNewEventsProcessor(t *testing.T) {
 	t.Parallel()
-
-	t.Run("nil client", func(t *testing.T) {
-		t.Parallel()
-
-		args := createNewEventMockArgs()
-		args.Client = nil
-
-		ep, err := process.NewEventsProcessor(args)
-		require.Nil(t, ep)
-		assert.Equal(t, process.ErrNilClient, err)
-	})
 
 	t.Run("nil pusher", func(t *testing.T) {
 		t.Parallel()
@@ -72,7 +60,7 @@ func TestRun(t *testing.T) {
 	args := createNewEventMockArgs()
 
 	numCalls := 0
-	args.Client = &mocks.ConnectorStub{
+	client := &mocks.ConnectorStub{
 		GetEventCalled: func() (data.NotificationMessage, error) {
 			numCalls++
 			return data.NotificationMessage{}, nil
@@ -81,6 +69,8 @@ func TestRun(t *testing.T) {
 
 	ep, err := process.NewEventsProcessor(args)
 	require.Nil(t, err)
+
+	ep.AddClients(client)
 
 	ep.Run()
 

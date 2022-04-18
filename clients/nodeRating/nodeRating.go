@@ -102,7 +102,7 @@ func (hcw *nodeRating) handleEvents() (data.NotificationMessage, error) {
 		if changePercentage > hcw.config.Threshold {
 			event.Level = common.CriticalEvent
 			nodeMsg := fmt.Sprintf(
-				"%s: TempRating decreased with %.1f percent, current value: %.2f, last value: %.2f\n",
+				"NodeName: %s - TempRating decreased with %.1f percent, current value: %.2f, last value: %.2f\n",
 				node.Name,
 				hcw.config.Threshold,
 				node.TempRating,
@@ -152,6 +152,10 @@ func (hcw *nodeRating) fetchAPINodesByBLSKey() ([]clients.APINode, error) {
 	}
 
 	return nodes, nil
+}
+
+func (hcw *nodeRating) GetID() string {
+	return "NodeRating"
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

@@ -62,7 +62,6 @@ func (mr *monitoringRunner) Start() error {
 	}
 
 	argsEventsProcessor := process.ArgsEventsProcessor{
-		Client:             nodeRatingClient,
 		Pusher:             notifyProcessor,
 		TriggerInternalSec: mr.config.General.TriggerIntervalSec,
 	}
@@ -70,6 +69,7 @@ func (mr *monitoringRunner) Start() error {
 	if err != nil {
 		return err
 	}
+	eventsProcessor.AddClients(nodeRatingClient)
 
 	eventsProcessor.Run()
 
