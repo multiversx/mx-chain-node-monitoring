@@ -22,11 +22,29 @@ type emailNotifier struct {
 
 // NewEmailNotifier will create a new email notifier instance
 func NewEmailNotifier(args ArgsEmailNotifier) (*emailNotifier, error) {
-	en := &emailNotifier{
-		config: args.Config,
+	err := checkArgs(args)
+	if err != nil {
+		return nil, err
 	}
 
-	return en, nil
+	return &emailNotifier{
+		config: args.Config,
+	}, nil
+}
+
+func checkArgs(args ArgsEmailNotifier) error {
+	if args.Config.EmailUsername == "" ||
+		args.Config.EmailPassword == "" {
+		return ErrInvalidEmailCredentials
+	}
+	if args.Config.EmailPort == 0 {
+		return ErrInvalidEmailHostPort
+	}
+	if len(args.Config.To) == 0 {
+		return ErrEmptyEmailToList
+	}
+
+	return nil
 }
 
 // PushMessage will push the notification
