@@ -55,9 +55,9 @@ func checkArgs(args ArgsEventsProcessor) error {
 }
 
 func (ep *eventsProcessor) AddClients(client Connector) {
-	ep.mutClients.RLock()
+	ep.mutClients.Lock()
 	ep.clients[client.GetID()] = client
-	ep.mutClients.RUnlock()
+	ep.mutClients.Unlock()
 }
 
 // Run will trigger the main process loop

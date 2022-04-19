@@ -20,18 +20,18 @@ func NewNotifyProcessor() *notifyProcessor {
 
 // AddNotifier will add a notifier instance to workers list
 func (np *notifyProcessor) AddNotifier(notifier Notifier) {
-	np.mutWorkers.RLock()
+	np.mutWorkers.Lock()
 	np.workers[notifier.GetID()] = notifier
-	np.mutWorkers.RUnlock()
+	np.mutWorkers.Unlock()
 }
 
 // PushMessage will push notification message to all registered workers
 func (np *notifyProcessor) PushMessage(msg data.NotificationMessage) {
-	np.mutWorkers.RLock()
+	np.mutWorkers.Lock()
 	for _, worker := range np.workers {
 		go worker.PushMessage(msg)
 	}
-	np.mutWorkers.RUnlock()
+	np.mutWorkers.Unlock()
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

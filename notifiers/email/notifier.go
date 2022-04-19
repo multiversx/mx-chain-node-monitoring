@@ -37,6 +37,9 @@ func checkArgs(args ArgsEmailNotifier) error {
 		args.Config.EmailPassword == "" {
 		return ErrInvalidEmailCredentials
 	}
+	if args.Config.EmailHost == "" {
+		return ErrInvalidEmailHost
+	}
 	if args.Config.EmailPort == 0 {
 		return ErrInvalidEmailHostPort
 	}

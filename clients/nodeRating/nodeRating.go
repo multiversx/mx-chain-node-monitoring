@@ -16,16 +16,13 @@ import (
 var log = logger.GetOrCreate("clients/nodeRating")
 
 const (
-	firstRunValue    float64 = -1
-	maxRating                = 100
-	minReqTimeoutSec         = 1
+	maxRating = 100
 )
 
 const (
 	baseURL = "https://api.elrond.com"
 
-	nodesIdentifierPath = "/nodes?identity=%s"
-	nodesBLSKeyPath     = "/nodes/%s"
+	nodesBLSKeyPath = "/nodes/%s"
 )
 
 // ArgsNodeRating defines the arguments needed to create a new client
