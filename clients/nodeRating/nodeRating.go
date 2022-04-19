@@ -16,7 +16,8 @@ import (
 var log = logger.GetOrCreate("clients/nodeRating")
 
 const (
-	maxRating = 100
+	maxRating        = 100
+	defaultLastValue = -1.0
 )
 
 const (
@@ -45,9 +46,14 @@ func NewNodeRatingClient(args ArgsNodeRating) (*nodeRating, error) {
 		return nil, err
 	}
 
+	lastValues := make(map[string]float64)
+	for _, pubKey := range args.Config.PubKeys {
+		lastValues[pubKey] = defaultLastValue
+	}
+
 	return &nodeRating{
 		httpClient: args.Client,
-		lastValues: make(map[string]float64),
+		lastValues: lastValues,
 		firstRun:   true,
 		config:     args.Config,
 	}, nil
@@ -88,24 +94,26 @@ func (hcw *nodeRating) handleEvents() (data.NotificationMessage, error) {
 
 	msg := ""
 	for _, node := range nodes {
-		// TODO: evaluate simply if the rating drops under a specified threshold
-		diff := node.TempRating - hcw.lastValues[node.Bls]
-		if diff >= 0 {
-			continue
-		}
+		if hcw.lastValues[node.Bls] != defaultLastValue {
+			// TODO: evaluate simply if the rating drops under a specified threshold
+			diff := node.TempRating - hcw.lastValues[node.Bls]
+			if diff >= 0 {
+				continue
+			}
 
-		changePercentage := math.Abs(diff) / float64(maxRating)
-		changePercentage = changePercentage * 100
-		if changePercentage > hcw.config.Threshold {
-			event.Level = common.CriticalEvent
-			nodeMsg := fmt.Sprintf(
-				"NodeName: %s - TempRating decreased with %.1f percent, current value: %.2f, last value: %.2f\n",
-				node.Name,
-				hcw.config.Threshold,
-				node.TempRating,
-				hcw.lastValues[node.Bls],
-			)
-			msg = msg + nodeMsg
+			changePercentage := math.Abs(diff) / float64(maxRating)
+			changePercentage = changePercentage * 100
+			if changePercentage > hcw.config.Threshold {
+				event.Level = common.CriticalEvent
+				nodeMsg := fmt.Sprintf(
+					"NodeName: %s - TempRating decreased with %.1f percent, current value: %.2f, last value: %.2f\n",
+					node.Name,
+					hcw.config.Threshold,
+					node.TempRating,
+					hcw.lastValues[node.Bls],
+				)
+				msg = msg + nodeMsg
+			}
 		}
 
 		hcw.lastValues[node.Bls] = node.TempRating
