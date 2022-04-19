@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createDefaultMockArgs() noderating.NodeRatingArgs {
-	return noderating.NodeRatingArgs{
+func createDefaultMockArgs() noderating.ArgsNodeRating {
+	return noderating.ArgsNodeRating{
 		Client: &mocks.HTTPClientStub{},
 		Config: &config.NodeRating{
 			Threshold: 1.0,

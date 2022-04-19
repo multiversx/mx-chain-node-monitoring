@@ -2,6 +2,7 @@ package process_test
 
 import (
 	"errors"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -59,10 +60,10 @@ func TestRun(t *testing.T) {
 
 	args := createNewEventMockArgs()
 
-	numCalls := 0
+	numCalls := uint32(0)
 	client := &mocks.ConnectorStub{
 		GetEventCalled: func() (data.NotificationMessage, error) {
-			numCalls++
+			atomic.AddUint32(&numCalls, 1)
 			return data.NotificationMessage{}, nil
 		},
 	}
@@ -78,5 +79,5 @@ func TestRun(t *testing.T) {
 
 	ep.Close()
 
-	assert.Equal(t, 2, numCalls)
+	assert.Equal(t, uint32(2), atomic.LoadUint32(&numCalls))
 }
