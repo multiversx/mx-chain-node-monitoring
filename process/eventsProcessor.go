@@ -54,6 +54,7 @@ func checkArgs(args ArgsEventsProcessor) error {
 	return nil
 }
 
+// AddClients will add a new client to the clients list
 func (ep *eventsProcessor) AddClients(client Connector) {
 	ep.mutClients.Lock()
 	ep.clients[client.GetID()] = client
@@ -108,6 +109,7 @@ func (ep *eventsProcessor) handleEvents() {
 	}
 }
 
+// Close will stop the main process loop
 func (ep *eventsProcessor) Close() error {
 	if ep.cancelFunc != nil {
 		ep.cancelFunc()

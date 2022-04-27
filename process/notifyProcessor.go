@@ -27,11 +27,11 @@ func (np *notifyProcessor) AddNotifier(notifier Notifier) {
 
 // PushMessage will push notification message to all registered workers
 func (np *notifyProcessor) PushMessage(msg data.NotificationMessage) {
-	np.mutWorkers.Lock()
+	np.mutWorkers.RLock()
 	for _, worker := range np.workers {
 		go worker.PushMessage(msg)
 	}
-	np.mutWorkers.Unlock()
+	np.mutWorkers.RUnlock()
 }
 
 // IsInterfaceNil returns true if there is no value under the interface

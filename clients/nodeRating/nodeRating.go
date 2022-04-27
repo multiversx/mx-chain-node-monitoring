@@ -159,6 +159,7 @@ func (hcw *nodeRating) fetchAPINodesByBLSKey() ([]clients.APINode, error) {
 	return nodes, nil
 }
 
+// GetID will return using id for client
 func (hcw *nodeRating) GetID() string {
 	return "NodeRating"
 }
