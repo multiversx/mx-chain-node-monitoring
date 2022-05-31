@@ -12,9 +12,17 @@
         ]
 
 [Notifiers]
+    [Notifiers.Slack]
+        # Enabled specifies whether the slack notifier will be enabled or not
+        Enabled = true
+
+        # URL represents the webhook url for a slack app workspace
+        # Example: "https://hooks.slack.com/services/YYYYYYYYY/XXXXXXXXXXX"
+        URL = ""
+
     [Notifiers.Email]
         # Enabled specifies whether the email notifier will be enabled or not
-        Enabled = true
+        Enabled = false
         
         # EmailHost represents the smtp host (like smtp.gmail.com)
         EmailHost = ""

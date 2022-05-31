@@ -16,6 +16,7 @@ type General struct {
 // Notifiers holds the configuration for notifiers
 type Notifiers struct {
 	Email *Email
+	Slack *Slack
 }
 
 // Alarms holds the configuration for the alarms defined
@@ -38,6 +39,12 @@ type Email struct {
 	EmailPassword string
 	From          string
 	To            []string
+}
+
+// Slack holds the configuration for slack notifier
+type Slack struct {
+	Enabled bool
+	URL     string
 }
 
 // FlagsConfig holds the values for CLI flags
