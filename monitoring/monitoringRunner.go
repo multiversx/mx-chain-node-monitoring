@@ -54,7 +54,10 @@ func (mr *monitoringRunner) Start() error {
 	notifyProcessor := process.NewNotifyProcessor()
 
 	if mr.config.Notifiers.Slack.Enabled {
-		argsSlackNotifier := slack.ArgsSlackNotifier{Config: mr.config.Notifiers.Slack}
+		argsSlackNotifier := &slack.ArgsSlackNotifier{
+			Config:     mr.config.Notifiers.Slack,
+			HTTPClient: httpClientWrapper,
+		}
 		slackNotifier, err := slack.NewSlackNotifier(argsSlackNotifier)
 		if err != nil {
 			return err
@@ -63,7 +66,9 @@ func (mr *monitoringRunner) Start() error {
 	}
 
 	if mr.config.Notifiers.Email.Enabled {
-		argsEmailNotifier := email.ArgsEmailNotifier{Config: mr.config.Notifiers.Email}
+		argsEmailNotifier := email.ArgsEmailNotifier{
+			Config: mr.config.Notifiers.Email,
+		}
 		emailNotifier, err := email.NewEmailNotifier(argsEmailNotifier)
 		if err != nil {
 			return err
