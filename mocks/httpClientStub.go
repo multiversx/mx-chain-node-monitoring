@@ -2,7 +2,8 @@ package mocks
 
 // HTTPClientStub implements HTTPClient interface
 type HTTPClientStub struct {
-	CallGetRestEndPointCalled func(address string, path string) ([]byte, error)
+	CallGetRestEndPointCalled  func(address string, path string) ([]byte, error)
+	CallPostRestEndPointCalled func(address string, path string, data interface{}) error
 }
 
 // CallGetRestEndPoint -
@@ -12,6 +13,15 @@ func (hcs *HTTPClientStub) CallGetRestEndPoint(address string, path string) ([]b
 	}
 
 	return nil, nil
+}
+
+// CallPostRestEndPoint -
+func (hcs *HTTPClientStub) CallPostRestEndPoint(address string, path string, data interface{}) error {
+	if hcs.CallPostRestEndPointCalled != nil {
+		return hcs.CallPostRestEndPointCalled(address, path, data)
+	}
+
+	return nil
 }
 
 // IsInterfaceNil -
