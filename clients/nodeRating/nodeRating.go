@@ -21,8 +21,6 @@ const (
 )
 
 const (
-	baseURL = "https://api.elrond.com"
-
 	nodesBLSKeyPath = "/nodes/%s"
 )
 
@@ -64,7 +62,10 @@ func checkArgs(args ArgsNodeRating) error {
 		return ErrNilHTTPClient
 	}
 	if len(args.Config.PubKeys) == 0 {
-		return fmt.Errorf("no public keys provided in config")
+		return ErrEmptyPubKeys
+	}
+	if len(args.Config.ApiUrl) == 0 {
+		return ErrEmptyApiUrl
 	}
 	if args.Config.Threshold <= 0 {
 		return fmt.Errorf("%w: invalid node rating threshold, provided %.2f", common.ErrInvalidValue, args.Config.Threshold)
@@ -142,7 +143,7 @@ func (hcw *nodeRating) fetchAPINodesByBLSKey() ([]clients.APINode, error) {
 
 	for _, pubKey := range hcw.config.PubKeys {
 		path := fmt.Sprintf(nodesBLSKeyPath, pubKey)
-		responseBodyBytes, err := hcw.httpClient.CallGetRestEndPoint(baseURL, path)
+		responseBodyBytes, err := hcw.httpClient.CallGetRestEndPoint(hcw.config.ApiUrl, path)
 		if err != nil {
 			return nil, err
 		}

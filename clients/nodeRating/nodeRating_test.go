@@ -20,6 +20,7 @@ func createDefaultMockArgs() noderating.ArgsNodeRating {
 		Client: &mocks.HTTPClientStub{},
 		Config: &config.NodeRating{
 			Threshold: 1.0,
+			ApiUrl:    "http://localhost:8080",
 			PubKeys:   []string{"pubk1"},
 		},
 	}
@@ -59,6 +60,17 @@ func TestNewNodeRatingClient(t *testing.T) {
 		nr, err := noderating.NewNodeRatingClient(args)
 		require.Nil(t, nr)
 		assert.True(t, errors.Is(err, common.ErrInvalidValue))
+	})
+
+	t.Run("empty api url in config", func(t *testing.T) {
+		t.Parallel()
+
+		args := createDefaultMockArgs()
+		args.Config.ApiUrl = ""
+
+		nr, err := noderating.NewNodeRatingClient(args)
+		require.Nil(t, nr)
+		assert.Equal(t, noderating.ErrEmptyApiUrl, err)
 	})
 
 	t.Run("should work", func(t *testing.T) {

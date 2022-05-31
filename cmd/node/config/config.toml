@@ -7,6 +7,9 @@
         # Threshold defines the percentage change limit in case node temprating is decreasing
         Threshold = 1.0
 
+        # APIURL defines the url for the Elrond api
+        ApiUrl = "https://api.elrond.com"
+
         # PubKeys defines the list of public keys (BLS keys) to be checked from api
         PubKeys = [
         ]
