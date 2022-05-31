@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	logger "github.com/ElrondNetwork/elrond-go-logger"
 	"github.com/ElrondNetwork/node-monitoring/config"
 	"github.com/ElrondNetwork/node-monitoring/data"
 )
+
+var log = logger.GetOrCreate("slackNotifier")
 
 type payload struct {
 	Text string `json:"text"`
@@ -48,16 +51,16 @@ func (sn *slackNotifier) PushMessage(msg data.NotificationMessage) error {
 }
 
 func (sn *slackNotifier) push(msg data.NotificationMessage) error {
-	data := payload{
+	msgPayload := payload{
 		Text: msg.Message,
 	}
-	payloadBytes, err := json.Marshal(data)
+	payloadBytes, err := json.Marshal(msgPayload)
 	if err != nil {
 		return err
 	}
 	body := bytes.NewReader(payloadBytes)
 
-	req, err := http.NewRequest("POST", sn.config.URL, body)
+	req, err := http.NewRequest(http.MethodPost, sn.config.URL, body)
 	if err != nil {
 		return err
 	}
@@ -67,7 +70,12 @@ func (sn *slackNotifier) push(msg data.NotificationMessage) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		errNotCritical := resp.Body.Close()
+		if errNotCritical != nil {
+			log.Warn("Slack notifier: close body", "error", errNotCritical.Error())
+		}
+	}()
 
 	return nil
 }

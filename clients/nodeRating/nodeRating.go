@@ -21,6 +21,7 @@ const (
 )
 
 const (
+	// TODO: handle a more generic path; we should be able to provide also node's api
 	nodesBLSKeyPath = "/nodes/%s"
 )
 
