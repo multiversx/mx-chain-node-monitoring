@@ -9,6 +9,7 @@ import (
 	noderating "github.com/ElrondNetwork/node-monitoring/clients/nodeRating"
 	"github.com/ElrondNetwork/node-monitoring/config"
 	"github.com/ElrondNetwork/node-monitoring/notifiers/email"
+	"github.com/ElrondNetwork/node-monitoring/notifiers/slack"
 	"github.com/ElrondNetwork/node-monitoring/process"
 )
 
@@ -51,6 +52,15 @@ func (mr *monitoringRunner) Start() error {
 	}
 
 	notifyProcessor := process.NewNotifyProcessor()
+
+	if mr.config.Notifiers.Slack.Enabled {
+		argsSlackNotifier := slack.ArgsSlackNotifier{Config: mr.config.Notifiers.Slack}
+		slackNotifier, err := slack.NewSlackNotifier(argsSlackNotifier)
+		if err != nil {
+			return err
+		}
+		notifyProcessor.AddNotifier(slackNotifier)
+	}
 
 	if mr.config.Notifiers.Email.Enabled {
 		argsEmailNotifier := email.ArgsEmailNotifier{Config: mr.config.Notifiers.Email}
