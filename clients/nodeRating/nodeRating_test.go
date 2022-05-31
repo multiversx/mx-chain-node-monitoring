@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	"github.com/ElrondNetwork/node-monitoring/clients"
-	"github.com/ElrondNetwork/node-monitoring/clients/mocks"
 	noderating "github.com/ElrondNetwork/node-monitoring/clients/nodeRating"
 	"github.com/ElrondNetwork/node-monitoring/common"
 	"github.com/ElrondNetwork/node-monitoring/config"
 	"github.com/ElrondNetwork/node-monitoring/data"
+	"github.com/ElrondNetwork/node-monitoring/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

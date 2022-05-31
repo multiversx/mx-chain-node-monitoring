@@ -1,13 +1,10 @@
 package slack
 
 import (
-	"bytes"
-	"encoding/json"
-	"net/http"
-
 	logger "github.com/ElrondNetwork/elrond-go-logger"
 	"github.com/ElrondNetwork/node-monitoring/config"
 	"github.com/ElrondNetwork/node-monitoring/data"
+	"github.com/ElrondNetwork/node-monitoring/notifiers"
 )
 
 var log = logger.GetOrCreate("slackNotifier")
@@ -18,28 +15,34 @@ type payload struct {
 
 // ArgsSlackNotifier defines the arguments needed to create a new slack notifier
 type ArgsSlackNotifier struct {
-	Config *config.Slack
+	Config     *config.Slack
+	HTTPClient notifiers.HTTPClient
 }
 
 type slackNotifier struct {
-	config *config.Slack
+	url        string
+	httpClient notifiers.HTTPClient
 }
 
 // NewSlackNotifier will create a new email notifier instance
-func NewSlackNotifier(args ArgsSlackNotifier) (*slackNotifier, error) {
+func NewSlackNotifier(args *ArgsSlackNotifier) (*slackNotifier, error) {
 	err := checkArgs(args)
 	if err != nil {
 		return nil, err
 	}
 
 	return &slackNotifier{
-		config: args.Config,
+		url:        args.Config.URL,
+		httpClient: args.HTTPClient,
 	}, nil
 }
 
-func checkArgs(args ArgsSlackNotifier) error {
+func checkArgs(args *ArgsSlackNotifier) error {
 	if args.Config.URL == "" {
 		return ErrInvalidSlackURL
+	}
+	if args.HTTPClient == nil {
+		return ErrNilHTTPClient
 	}
 
 	return nil
@@ -47,37 +50,11 @@ func checkArgs(args ArgsSlackNotifier) error {
 
 // PushMessage will push the notification
 func (sn *slackNotifier) PushMessage(msg data.NotificationMessage) error {
-	return sn.push(msg)
-}
-
-func (sn *slackNotifier) push(msg data.NotificationMessage) error {
 	msgPayload := payload{
 		Text: msg.Message,
 	}
-	payloadBytes, err := json.Marshal(msgPayload)
-	if err != nil {
-		return err
-	}
-	body := bytes.NewReader(payloadBytes)
 
-	req, err := http.NewRequest(http.MethodPost, sn.config.URL, body)
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		errNotCritical := resp.Body.Close()
-		if errNotCritical != nil {
-			log.Warn("Slack notifier: close body", "error", errNotCritical.Error())
-		}
-	}()
-
-	return nil
+	return sn.httpClient.CallPostRestEndPoint(sn.url, "", msgPayload)
 }
 
 // GetID will return the identifier for slack notifier
