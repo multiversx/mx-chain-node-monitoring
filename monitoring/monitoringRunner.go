@@ -54,7 +54,7 @@ func (mr *monitoringRunner) Start() error {
 	notifyProcessor := process.NewNotifyProcessor()
 
 	if mr.config.Notifiers.Slack.Enabled {
-		argsSlackNotifier := &slack.ArgsSlackNotifier{
+		argsSlackNotifier := slack.ArgsSlackNotifier{
 			Config:     mr.config.Notifiers.Slack,
 			HTTPClient: httpClientWrapper,
 		}

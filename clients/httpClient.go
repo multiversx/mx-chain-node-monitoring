@@ -42,6 +42,8 @@ func NewHTTPClientWrapper(args HTTPClientWrapperArgs) (*httpClientWrapper, error
 	}, nil
 }
 
+// TODO: set address+path as one variable
+
 // CallGetRestEndPoint calls an external end point
 func (hcw *httpClientWrapper) CallGetRestEndPoint(
 	address string,

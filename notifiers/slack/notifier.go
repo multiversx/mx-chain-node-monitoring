@@ -25,7 +25,7 @@ type slackNotifier struct {
 }
 
 // NewSlackNotifier will create a new email notifier instance
-func NewSlackNotifier(args *ArgsSlackNotifier) (*slackNotifier, error) {
+func NewSlackNotifier(args ArgsSlackNotifier) (*slackNotifier, error) {
 	err := checkArgs(args)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func NewSlackNotifier(args *ArgsSlackNotifier) (*slackNotifier, error) {
 	}, nil
 }
 
-func checkArgs(args *ArgsSlackNotifier) error {
+func checkArgs(args ArgsSlackNotifier) error {
 	if args.Config.URL == "" {
 		return ErrInvalidSlackURL
 	}

@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createMockSlackNotifierArgs() *slack.ArgsSlackNotifier {
-	return &slack.ArgsSlackNotifier{
+func createMockSlackNotifierArgs() slack.ArgsSlackNotifier {
+	return slack.ArgsSlackNotifier{
 		Config: &config.Slack{
 			Enabled: true,
 			URL:     "http://localhost",
