@@ -7,14 +7,25 @@
         # Threshold defines the percentage change limit in case node temprating is decreasing
         Threshold = 1.0
 
+        # ApiUrl defines the url for the Elrond api
+        ApiUrl = "https://api.elrond.com"
+
         # PubKeys defines the list of public keys (BLS keys) to be checked from api
         PubKeys = [
         ]
 
 [Notifiers]
+    [Notifiers.Slack]
+        # Enabled specifies whether the slack notifier will be enabled or not
+        Enabled = true
+
+        # URL represents the webhook url for a slack app workspace
+        # Example: "https://hooks.slack.com/services/YYYYYYYYY/XXXXXXXXXXX"
+        URL = ""
+
     [Notifiers.Email]
         # Enabled specifies whether the email notifier will be enabled or not
-        Enabled = true
+        Enabled = false
         
         # EmailHost represents the smtp host (like smtp.gmail.com)
         EmailHost = ""

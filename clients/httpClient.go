@@ -1,6 +1,8 @@
 package clients
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -40,12 +42,14 @@ func NewHTTPClientWrapper(args HTTPClientWrapperArgs) (*httpClientWrapper, error
 	}, nil
 }
 
+// TODO: set address+path as one variable
+
 // CallGetRestEndPoint calls an external end point
 func (hcw *httpClientWrapper) CallGetRestEndPoint(
 	address string,
 	path string,
 ) ([]byte, error) {
-	req, err := http.NewRequest("GET", address+path, nil)
+	req, err := http.NewRequest(http.MethodGet, address+path, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -71,6 +75,44 @@ func (hcw *httpClientWrapper) CallGetRestEndPoint(
 	}()
 
 	return ioutil.ReadAll(resp.Body)
+}
+
+// CallPostRestEndPoint calls an external end point
+func (hcw *httpClientWrapper) CallPostRestEndPoint(
+	address string,
+	path string,
+	data interface{},
+) error {
+	buff, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, address+path, bytes.NewReader(buff))
+	if err != nil {
+		return err
+	}
+
+	userAgent := "Elrond Node Monitoring / 1.0.0 <Requesting data from api>"
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", userAgent)
+
+	resp, err := hcw.httpClient.Do(req)
+	if err != nil {
+		if isTimeoutError(err) {
+			return err
+		}
+
+		return err
+	}
+
+	errNotCritical := resp.Body.Close()
+	if errNotCritical != nil {
+		log.Warn("base process GET: close body", "error", errNotCritical.Error())
+	}
+
+	return nil
 }
 
 func isTimeoutError(err error) bool {
