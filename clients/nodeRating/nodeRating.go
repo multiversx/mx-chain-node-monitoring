@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/ElrondNetwork/elrond-go-core/core/check"
-	logger "github.com/ElrondNetwork/elrond-go-logger"
-	"github.com/ElrondNetwork/node-monitoring/clients"
-	"github.com/ElrondNetwork/node-monitoring/common"
-	"github.com/ElrondNetwork/node-monitoring/config"
-	"github.com/ElrondNetwork/node-monitoring/data"
+	"github.com/multiversx/mx-chain-core-go/core/check"
+	logger "github.com/multiversx/mx-chain-logger-go"
+	"github.com/multiversx/mx-chain-node-monitoring/clients"
+	"github.com/multiversx/mx-chain-node-monitoring/common"
+	"github.com/multiversx/mx-chain-node-monitoring/config"
+	"github.com/multiversx/mx-chain-node-monitoring/data"
 )
 
 var log = logger.GetOrCreate("clients/nodeRating")

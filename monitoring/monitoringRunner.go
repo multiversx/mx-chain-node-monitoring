@@ -4,13 +4,13 @@ import (
 	"os"
 	"os/signal"
 
-	logger "github.com/ElrondNetwork/elrond-go-logger"
-	"github.com/ElrondNetwork/node-monitoring/clients"
-	noderating "github.com/ElrondNetwork/node-monitoring/clients/nodeRating"
-	"github.com/ElrondNetwork/node-monitoring/config"
-	"github.com/ElrondNetwork/node-monitoring/notifiers/email"
-	"github.com/ElrondNetwork/node-monitoring/notifiers/slack"
-	"github.com/ElrondNetwork/node-monitoring/process"
+	logger "github.com/multiversx/mx-chain-logger-go"
+	"github.com/multiversx/mx-chain-node-monitoring/clients"
+	noderating "github.com/multiversx/mx-chain-node-monitoring/clients/nodeRating"
+	"github.com/multiversx/mx-chain-node-monitoring/config"
+	"github.com/multiversx/mx-chain-node-monitoring/notifiers/email"
+	"github.com/multiversx/mx-chain-node-monitoring/notifiers/slack"
+	"github.com/multiversx/mx-chain-node-monitoring/process"
 )
 
 var log = logger.GetOrCreate("monitoring")

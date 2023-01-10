@@ -1,10 +1,10 @@
 package slack
 
 import (
-	logger "github.com/ElrondNetwork/elrond-go-logger"
-	"github.com/ElrondNetwork/node-monitoring/config"
-	"github.com/ElrondNetwork/node-monitoring/data"
-	"github.com/ElrondNetwork/node-monitoring/notifiers"
+	logger "github.com/multiversx/mx-chain-logger-go"
+	"github.com/multiversx/mx-chain-node-monitoring/config"
+	"github.com/multiversx/mx-chain-node-monitoring/data"
+	"github.com/multiversx/mx-chain-node-monitoring/notifiers"
 )
 
 var log = logger.GetOrCreate("slackNotifier")

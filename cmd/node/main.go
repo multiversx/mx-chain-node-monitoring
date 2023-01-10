@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	logger "github.com/ElrondNetwork/elrond-go-logger"
-	"github.com/ElrondNetwork/node-monitoring/config"
-	"github.com/ElrondNetwork/node-monitoring/monitoring"
+	logger "github.com/multiversx/mx-chain-logger-go"
+	"github.com/multiversx/mx-chain-node-monitoring/config"
+	"github.com/multiversx/mx-chain-node-monitoring/monitoring"
 	"github.com/urfave/cli"
 )
 
@@ -37,14 +37,14 @@ VERSION:
 func main() {
 	app := cli.NewApp()
 	cli.AppHelpTemplate = cliHelpTemplate
-	app.Name = "Elrond Node Monitoring"
+	app.Name = "MultiversX Node Monitoring"
 	app.Flags = []cli.Flag{
 		generalConfigFile,
 	}
 	app.Authors = []cli.Author{
 		{
-			Name:  "The Elrond Team",
-			Email: "contact@elrond.com",
+			Name:  "The MultiversX Team",
+			Email: "contact@multiversx.com",
 		},
 	}
 	app.Action = startNodeMonitoring

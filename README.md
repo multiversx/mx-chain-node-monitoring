@@ -1,10 +1,10 @@
 # node-monitoring
 
-Node monitoring tool - a lightweight monitoring tool for elrond-go node.
+Node monitoring tool - a lightweight monitoring tool for mx-chain-go node.
 
 It is designed to be able to define multiple clients(plugins) to fetch the node info, and to be able to push notification events to one or multiple notifiers.
 
-For now it has a single client which checks a node (or nodes) temp rating via elrond api (select node by public key).
+For now it has a single client which checks a node (or nodes) temp rating via multiversx api (select node by public key).
 
 # How to use
 

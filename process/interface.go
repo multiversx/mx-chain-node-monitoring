@@ -1,6 +1,6 @@
 package process
 
-import "github.com/ElrondNetwork/node-monitoring/data"
+import "github.com/multiversx/mx-chain-node-monitoring/data"
 
 // Notifier defines the behaviour of a notifier instance
 type Notifier interface {

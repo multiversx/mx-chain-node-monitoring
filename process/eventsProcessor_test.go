@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ElrondNetwork/node-monitoring/common"
-	"github.com/ElrondNetwork/node-monitoring/data"
-	"github.com/ElrondNetwork/node-monitoring/process"
-	"github.com/ElrondNetwork/node-monitoring/process/mocks"
+	"github.com/multiversx/mx-chain-node-monitoring/common"
+	"github.com/multiversx/mx-chain-node-monitoring/data"
+	"github.com/multiversx/mx-chain-node-monitoring/process"
+	"github.com/multiversx/mx-chain-node-monitoring/process/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

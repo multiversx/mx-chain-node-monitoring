@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/ElrondNetwork/elrond-go-core/core"
+	"github.com/multiversx/mx-chain-core-go/core"
 )
 
 // LoadConfig returns email configuration by reading the config file provided
