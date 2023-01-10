@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	logger "github.com/ElrondNetwork/elrond-go-logger"
-	"github.com/ElrondNetwork/node-monitoring/common"
+	logger "github.com/multiversx/mx-chain-logger-go"
+	"github.com/multiversx/mx-chain-node-monitoring/common"
 )
 
 var log = logger.GetOrCreate("clients/httpClient")
@@ -54,7 +54,7 @@ func (hcw *httpClientWrapper) CallGetRestEndPoint(
 		return nil, err
 	}
 
-	userAgent := "Elrond Node Monitoring / 1.0.0 <Requesting data from api>"
+	userAgent := "MultiversX Node Monitoring / 1.0.0 <Requesting data from api>"
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", userAgent)
 
@@ -93,7 +93,7 @@ func (hcw *httpClientWrapper) CallPostRestEndPoint(
 		return err
 	}
 
-	userAgent := "Elrond Node Monitoring / 1.0.0 <Requesting data from api>"
+	userAgent := "MultiversX Node Monitoring / 1.0.0 <Requesting data from api>"
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", userAgent)

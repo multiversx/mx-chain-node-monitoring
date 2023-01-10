@@ -5,12 +5,12 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ElrondNetwork/node-monitoring/clients"
-	noderating "github.com/ElrondNetwork/node-monitoring/clients/nodeRating"
-	"github.com/ElrondNetwork/node-monitoring/common"
-	"github.com/ElrondNetwork/node-monitoring/config"
-	"github.com/ElrondNetwork/node-monitoring/data"
-	"github.com/ElrondNetwork/node-monitoring/mocks"
+	"github.com/multiversx/mx-chain-node-monitoring/clients"
+	noderating "github.com/multiversx/mx-chain-node-monitoring/clients/nodeRating"
+	"github.com/multiversx/mx-chain-node-monitoring/common"
+	"github.com/multiversx/mx-chain-node-monitoring/config"
+	"github.com/multiversx/mx-chain-node-monitoring/data"
+	"github.com/multiversx/mx-chain-node-monitoring/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

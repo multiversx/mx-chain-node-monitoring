@@ -7,8 +7,8 @@
         # Threshold defines the percentage change limit in case node temprating is decreasing
         Threshold = 1.0
 
-        # ApiUrl defines the url for the Elrond api
-        ApiUrl = "https://api.elrond.com"
+        # ApiUrl defines the url for the main api
+        ApiUrl = "https://api.multiversx.com"
 
         # PubKeys defines the list of public keys (BLS keys) to be checked from api
         PubKeys = [

@@ -1,6 +1,6 @@
 package data
 
-import "github.com/ElrondNetwork/node-monitoring/common"
+import "github.com/multiversx/mx-chain-node-monitoring/common"
 
 type NotificationMessage struct {
 	Message string

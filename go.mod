@@ -1,10 +1,10 @@
-module github.com/ElrondNetwork/node-monitoring
+module github.com/multiversx/mx-chain-node-monitoring
 
 go 1.17
 
 require (
-	github.com/ElrondNetwork/elrond-go-core v1.0.0
-	github.com/ElrondNetwork/elrond-go-logger v1.0.7
+	github.com/multiversx/mx-chain-core-go v1.1.30
+	github.com/multiversx/mx-chain-logger-go v1.0.11
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli v1.22.5
 )
@@ -20,7 +20,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )

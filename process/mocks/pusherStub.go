@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/ElrondNetwork/node-monitoring/data"
+import "github.com/multiversx/mx-chain-node-monitoring/data"
 
 // PusherStub implements process.Pusher
 type PusherStub struct {

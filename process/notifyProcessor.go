@@ -3,7 +3,7 @@ package process
 import (
 	"sync"
 
-	"github.com/ElrondNetwork/node-monitoring/data"
+	"github.com/multiversx/mx-chain-node-monitoring/data"
 )
 
 type notifyProcessor struct {

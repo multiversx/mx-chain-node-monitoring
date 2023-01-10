@@ -3,10 +3,10 @@ package slack_test
 import (
 	"testing"
 
-	"github.com/ElrondNetwork/node-monitoring/config"
-	"github.com/ElrondNetwork/node-monitoring/data"
-	"github.com/ElrondNetwork/node-monitoring/mocks"
-	"github.com/ElrondNetwork/node-monitoring/notifiers/slack"
+	"github.com/multiversx/mx-chain-node-monitoring/config"
+	"github.com/multiversx/mx-chain-node-monitoring/data"
+	"github.com/multiversx/mx-chain-node-monitoring/mocks"
+	"github.com/multiversx/mx-chain-node-monitoring/notifiers/slack"
 	"github.com/stretchr/testify/require"
 )
 
